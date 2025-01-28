@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .startRangeInput,
+        .endRangeInput {
+            width: 47%;
+            flex: 1;
+        }
+
+        .container {
+            width: 95vw;
+            height: 90vh;
+            max-width: 100vw;
+            margin: 4vh auto 0vh;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .big-number {
+            font-size: 250px;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #ff5722;
+        }
+
+        .deleteRangebtn,
+        .rangeRenamebtn {
+            min-width: auto !important;
+        }
+
+        .btn {
+            min-width: 120px;
+            margin: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .btn-warning {
+            background-color: #ff9800;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #ffa726;
+        }
+
+        .btn-primary {
+            background-color: #1976d2;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #2196f3;
+        }
+
+        .btn-danger {
+            background-color: #d32f2f;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #f44336;
+        }
+
+        .input-group .form-control {
+            background-color: #2e2e2e;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        .box {
+            padding: 50px 13px 15px 15px;
+            background-color: #2e2e2e;
+            border-radius: 8px;
+            border: 1px solid #444;
+            position: relative;
+            font-size: 18px;
+        }
+
+        .box-title {
+            position: absolute;
+            top: 8px;
+            left: 13px;
+            padding: 1.5px 10px;
+            color: rgb(255, 255, 255);
+            background-color: #dc3545;
+            border-radius: 15px;
+        }
+
+        .box-range-title {
+            margin: 5px auto;
+        }
+
+        .scrollable-ranges {
+            max-height: 31.2vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .scrollable-box {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .scrollable-ranges::-webkit-scrollbar,
+        .scrollable-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable-ranges::-webkit-scrollbar-track,
+        .scrollable-box::-webkit-scrollbar-track {
+            background: #1e1e1e;
+            border-radius: 4px;
+        }
+
+        .scrollable-ranges::-webkit-scrollbar-thumb,
+        .scrollable-box::-webkit-scrollbar-thumb {
+            background: #ff9800;
+            border-radius: 4px;
+        }
+
+        .scrollable-ranges::-webkit-scrollbar-thumb:hover,
+        .scrollable-box::-webkit-scrollbar-thumb:hover {
+            background: #ffa726;
+        }
+
+        .scrollable-ranges,
+        .scrollable-box {
+            scrollbar-width: thin;
+            scrollbar-color: #ff9800 #1e1e1e;
+        }
+
+        .scrollable-ranges::-ms-scrollbar,
+        .scrollable-box::-ms-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .action-btns {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+        }
+
+        .action-btns button {
+            margin-left: 5px;
+            color: #fff;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btns button:hover {
+            color: #ffa726;
+        }
+
+        .action-btns button:disabled {
+            color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #absentNumbers:focus {
+            outline-color: white;
+            padding: 4px;
+        }
+
+        .mute-button-container {
+            position: absolute !important;
+            left: 2.8vw;
+            top: 4.8vh;
+        }
+
+        .btn-mute {
+            font-size: 25px;
+            min-width: auto;
+            padding: 5px 10px;
+            color: #fff;
+            background: #2e2e2e;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Context Menu */
+        .custom-context-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            /* Position below the button */
+            left: 0;
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 200px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .custom-context-menu label {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .custom-context-menu input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .custom-context-menu::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            border-width: 10px;
+            border-style: solid;
+            border-color: transparent transparent #1e1e1e transparent;
+        }
+
+
+        /* Popup Overlay */
+        .custom-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            /* Semi-transparent background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .custom-popup.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Popup Box */
+        .popup-content {
+            background: #292929;
+            /* Darker background for box */
+            border-radius: 20px;
+            /* Rounded corners */
+            padding: 25px 30px;
+            /* width: 400px; */
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            /* Soft shadow */
+            transform: translateY(-30px);
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        /* Slide-In Animation */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .popup-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f9a825;
+            /* Vibrant yellow accent */
+            margin: 0;
+        }
+
+        .popup-close-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .popup-close-btn:hover {
+            color: #f44336;
+            /* Red close button on hover */
+        }
+
+        /* Body */
+        .popup-body {
+            margin-bottom: 20px;
+        }
+
+        .popup-message {
+            font-size: 16px;
+            color: #d3d3d3;
+            /* Soft text color */
+            margin-bottom: 15px;
+        }
+
+        .popup-input {
+            width: 100%;
+            padding: 7px;
+            font-size: 18px;
+            border: 1px solid #555;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        /* Footer Buttons */
+        .popup-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .popup-confirm-btn {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .popup-confirm-btn:hover {
+            background: #3f7d42;
+        }
+
+        .popup-cancel-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: #fff;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        .popup-cancel-btn:hover {
+            background: #555;
+            color: #f44336;
+        }
+
+        /* Alert Container */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 300px;
+            z-index: 2000;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Alert Box */
+        .alert-content {
+            position: relative;
+            color: #fff;
+            border-radius: 10px;
+            padding: 5px 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Message Text */
+        .alert-message {
+            font-size: 18px;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        /* Close Button */
+        .alert-close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .alert-close-btn:hover {
+            color: #000000;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background-color: #ffffffb6;
+            width: 100%;
+            animation: progress 1s linear;
+        }
+
+        /* Fade-In Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Fade-Out Animation */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Progress Animation */
+        @keyframes progress {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0;
+            }
+        }
+
+        /* Success Background */
+        .alert-success {
+            background-color: #4caf50;
+        }
+
+        /* Danger Background */
+        .alert-danger {
+            background-color: #f44336;
+        }
+
+
+        footer {
+            text-align: center;
+            margin-top: 13px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Popup Box -->
+    <div id="customPopup" class="custom-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3 id="popupTitle" class="popup-title"></h3>
+                <button class="popup-close-btn" onclick="closePopup()">✕</button>
+            </div>
+            <div class="popup-body">
+                <p id="popupMessage" class="popup-message"></p>
+                <input type="text" id="popupInput" class="form-control popup-input" style="display: none;" />
+            </div>
+            <div class="popup-footer">
+                <button class="btn btn-primary popup-confirm-btn" id="popupConfirmBtn">Confirm</button>
+                <button class="btn btn-outline-light popup-cancel-btn" id="popupCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Alert -->
+    <div id="customAlert" class="custom-alert">
+        <div class="alert-content">
+            <span class="alert-message"></span>
+            <button class="alert-close-btn" onclick="closeCustomAlert()">✕</button>
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+    <!--Main Content-->
+    <div class="container">
+        <h1 class="mb-1 text-center">Attendance System</h1>
+        <div class="row">
+            <!-- Left Section: Range Inputs and Start/Stop Buttons -->
+            <div class="col-3">
+                <div class="mb-2">
+                    <div class="box py-1 px-2 mb-2">
+                        <div>
+                            <div class="box-range-title">
+                                Select Range
+                            </div>
+                            <div class="action-btns mt-1">
+                                <button onclick="renameRange()" id="renameButton" title="Rename (F2)" disabled><i
+                                        class="bi bi-cursor-text"></i></button>
+                                <button onclick="deleteSavedRange()" id="deleteButton" title="Delete (Delete)"
+                                    disabled><i class="bi bi-trash3"></i></button>
+                                <button onclick="resetDropDown()" id="resetButton" title="Reset"><i
+                                        class="bi bi-arrow-clockwise"></i></button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center mb-1 range-group">
+                                <select id="rangeDropdown" class="form-select"
+                                    onchange="setRangesFromDropdown(); onDropdownChange();">
+                                    <option value="" disabled selected>Select a range</option>
+                                </select>
+                            </div>
+                            <div class="d-flex ">
+                                <button class="btn btn-success w-50" id="saveChangesButton" disabled
+                                    onclick="saveChanges()" title="Save (Ctrl + s)">Save</button>
+                                <button class="btn btn-primary ms-0 me-0 w-50" onclick="saveRanges()"
+                                    title="Save As (Ctrl + s)">Save As</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box py-1 px-2 mb-2">
+                    <button class="btn btn-primary w-100 ms-0 mb-2" id="addRangeButton" onclick="addRange()"
+                        title="Add Range (+)">
+                        Add Range</button>
+                    <div id="rangesContainer" class="scrollable-ranges">
+                        <div class="d-flex align-items-center mb-2 range-group">
+                            <input type="number" class="form-control me-2 startRangeInput" placeholder="Start">
+                            <input type="number" class="form-control me-1 endRangeInput" placeholder="End">
+                            <button class="btn btn-danger deleteRangebtn" title="Remove" onclick="deleteRange(this)">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-1">
+                    <label class="form-label text-start w-100 mb-1">Attendance Type</label>
+                    <div class="d-flex">
+                        <div>
+                            <input type="radio" id="absentNos" name="attendanceType" value="absent" checked
+                                onclick="setAttendanceType('absent')">
+                            <label for="absentNos" class="me-4">Absent Nos</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="presentNos" name="attendanceType" value="present"
+                                onclick="setAttendanceType('present')">
+                            <label for="presentNos">Present Nos</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <button class="btn btn-warning ms-0" onclick="startRange()" id="startButton"
+                        title="Start (s)">Start</button>
+                    <button class="btn btn-danger " onclick="stopRange()" id="stopButton" title="Stop (s)"
+                        disabled>Stop</button>
+                </div>
+            </div>
+
+            <!-- Center Section: Current Number Display -->
+            <div class="col text-center">
+                <div class="big-number" id="currentNumber">--</div>
+                <div class="d-flex justify-content-center mt-4">
+                    <button class="btn btn-primary" onclick="prevNumber()" id="prevButton" title="Previous (upArrow)"
+                        disabled>Previous</button>
+                    <button class="btn btn-primary" onclick="nextNumber()" id="nextButton" title="Next (downArrow)"
+                        disabled>Next</button>
+                    <button class="btn btn-warning" onclick="markAbsent()" id="absentButton"
+                        title="Absent/Present (Space)" disabled>Absent</button>
+                </div>
+            </div>
+
+            <!-- Right Section: Box Component -->
+            <div class="col-3">
+                <div class="box">
+                    <div class="box-header">
+                        <div id="box-title" class="box-title">
+                            <span id="attendance-text">Absent</span> : <span id="absentCount">0</span>
+                        </div>
+                        <div class="action-btns">
+                            <button onclick="copyBox()" title="Copy"><i class="bi bi-copy"></i></button>
+                            <button onclick="clearBox()" title="Clear"><i class="bi bi-file-earmark-x"></i></button>
+                            <button onclick="editBox()" title="Edit"><i class="bi bi-pencil-square"></i></button>
+                        </div>
+                    </div>
+                    <div class="scrollable-box">
+                        <div id="absentNumbers" contenteditable="false">
+                            No numbers marked as absent.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="mute-button-container">
+            <button id="toggleSpeechButton" class="btn btn-secondary btn-mute" onclick="toggleSpeech()"
+                title="Mute/Unmute (m)">
+                <i class='bi bi-volume-up'></i>
+            </button>
+        </div> -->
+        <div class="mute-button-container position-relative">
+            <button id="toggleSpeechButton" class="btn btn-secondary btn-mute" onclick="toggleSpeech()"
+                oncontextmenu="volumeContextMenu(event)" title="Mute/Unmute (m)">
+                <i class='bi bi-volume-up'></i>
+            </button>
+
+            <!-- Custom Context Menu -->
+            <div id="speechContextMenu" class="custom-context-menu">
+                <label for="rateRange">Rate</label>
+                <input type="range" id="rateRange" oninput="volumeRangeInput(event)" min="0.1" max="10" step="0.1"
+                    value="3.5">
+
+                <label for="pitchRange">Pitch</label>
+                <input type="range" id="pitchRange" oninput="volumeRangeInput(event)" min="0" max="2" step="0.1"
+                    value="1.5">
+
+                <label for="volumeRange">Volume</label>
+                <input type="range" id="volumeRange" oninput="volumeRangeInput(event)" min="0" max="1" step="0.1"
+                    value="1">
+            </div>
+        </div>
+
+    </div>
+    <footer>Designed by Pansuriya Umang | 23010101635</footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let current = null;
+        let start = null;
+        let end = null;
+        let activeRangeIndex = 0; // Index of the current active range
+        let ranges = []; // Array to hold the start and end ranges
+        let absents = [];
+        let attendanceType = 'absent'; // Default type
+        let rangeDictionary = JSON.parse(localStorage.getItem("rangeDictionary")) || {};
+        let isSpeechEnabled = true;
+        let isEditMode = false;
+        let speechRate = document.getElementById("rateRange").value;
+        let speechPitch = document.getElementById("pitchRange").value;
+        let speechVolume = document.getElementById("volumeRange").value;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateDropdown();
+        });
+        document.addEventListener('click', (event) => {
+            const contextMenu = document.getElementById('speechContextMenu');
+            if (!contextMenu.contains(event.target)) {
+                contextMenu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            const absentNumbersDiv = document.getElementById('absentNumbers');
+            if (!isEditMode) {
+                // console.log(event.key);
+                switch (event.key) {
+                    case 'ArrowDown': // Next Number
+                        event.preventDefault(); // Prevent page scroll
+                        nextNumber();
+                        break;
+                    case 'ArrowUp': // Previous Number
+                        event.preventDefault(); // Prevent page scroll
+                        prevNumber();
+                        break;
+                    case 'm': // Previous Number
+                        event.preventDefault(); // Prevent page scroll
+                        toggleSpeech();
+                        break;
+                    case 's':
+                        event.preventDefault();
+                        if ((event.ctrlKey || event.metaKey)) {
+                            const selectedNumber = document.getElementById('rangeDropdown').value;
+                            if (selectedNumber) {
+                                saveChanges();
+                            } else {
+                                saveRanges();
+                            }
+                        } else {
+                            if (current == null)
+                                startRange();
+                            else
+                                stopRange();
+                        }
+                        break;
+                    case '+':
+                        addRange()
+                        break;
+                    case 'F2':
+                        renameRange()
+                        break;
+                    case 'Delete':
+                        deleteSavedRange()
+                        break;
+                    case ' ': // Mark Absent (Spacebar)
+                        event.preventDefault(); // Prevent page scroll
+                        markAbsent();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+        function setAttendanceType(type) {
+            attendanceType = type;
+            if (attendanceType === 'absent') {
+                document.getElementById('box-title').style.backgroundColor = '#dc3545';
+            } else {
+                document.getElementById('box-title').style.backgroundColor = '#198754';
+            }
+            updateBoxContent();
+            updateAbsentButtonText();
+        }
+
+        function startRange() {
+            const startInputs = document.querySelectorAll('.startRangeInput');
+            const endInputs = document.querySelectorAll('.endRangeInput');
+
+            ranges = [];
+            activeRangeIndex = 0;
+
+            for (let i = 0; i < startInputs.length; i++) {
+                const start = parseInt(startInputs[i].value);
+                const end = parseInt(endInputs[i].value);
+
+                if (!isNaN(start) && !isNaN(end) && start <= end) {
+                    ranges.push({ start, end });
+                    if (attendanceType === 'present') {
+                        absents = [...absents, ...Array.from({ length: end - start + 1 }, (_, i) => start + i)];
+                    }
+                } else {
+                    showSweetAlert(`Invalid range in range ${i + 1}.`, "danger", 3000);
+                    return;
+                }
+            }
+
+            if (ranges.length > 0) {
+                current = ranges[activeRangeIndex].start;
+                updateDisplay();
+                enableControls();
+                announceCurrentNumber();
+
+                document.getElementById('stopButton').disabled = false;
+                document.getElementById('startButton').disabled = true;
+
+                document.getElementById('addRangeButton').disabled = true;
+                document.querySelectorAll('.deleteRangebtn').forEach(c => c.disabled = true);
+            } else {
+                showSweetAlert('Please add at least one valid range.', "danger", 3000);
+
+            }
+        }
+
+        function stopRange() {
+            disableControls();
+            document.getElementById('stopButton').disabled = true;
+            document.getElementById('startButton').disabled = false;
+
+            document.getElementById('addRangeButton').disabled = false;
+            document.querySelectorAll('.deleteRangebtn').forEach(c => c.disabled = false);
+            // Clear the input fields
+            // document.querySelectorAll('.startRangeInput').forEach(input => (input.value = ''));
+            // document.querySelectorAll('.endRangeInput').forEach(input => (input.value = ''));
+
+
+            document.getElementById('currentNumber').innerHTML = '--';
+            ranges = [];
+            activeRangeIndex = 0;
+            current = null;
+            absents = [];
+            updateBoxContent();
+        }
+
+        function addRange() {
+            const rangeContainer = document.querySelector('.scrollable-ranges');
+            const newRangeGroup = document.createElement('div');
+            newRangeGroup.className = 'd-flex align-items-center mb-2 range-group';
+            newRangeGroup.innerHTML = `
+                        <input type="number" class="form-control me-2 startRangeInput" placeholder="Start">
+                        <input type="number" class="form-control me-1 endRangeInput" placeholder="End">
+                        <button class="btn btn-danger deleteRangebtn" onclick="deleteRange(this)">
+                            <i class="bi bi-x-circle"></i>
+                        </button>`;
+            document.querySelector('.scrollable-ranges').appendChild(newRangeGroup);
+
+            // Move the Add Range button below the new range
+            // const addRangeButton = document.getElementById('addRangeButton');
+            // rangeContainer.appendChild(addRangeButton);
+        }
+
+        function deleteRange(button) {
+            const rangeGroup = button.closest('.range-group');
+            rangeGroup.parentNode.removeChild(rangeGroup);
+        }
+
+        function toggleSpeech() {
+            isSpeechEnabled = !isSpeechEnabled; // Toggle the state
+            const button = document.getElementById("toggleSpeechButton");
+            button.innerHTML = isSpeechEnabled
+                ? "<i class='bi bi-volume-up'></i>"
+                : "<i class='bi bi-volume-mute'></i>";
+        }
+
+        function announceCurrentNumber() {
+            if (!isSpeechEnabled || !('speechSynthesis' in window) || current === null) return;
+
+            const utterance = new SpeechSynthesisUtterance(current);
+            utterance.lang = 'en-US';
+            utterance.rate = speechRate; // Adjust the rate (0.1 to 10)
+            utterance.pitch = speechPitch; // Adjust the pitch (0 to 2)
+            utterance.volume = speechVolume; // Adjust the volume (0 to 1)
+            window.speechSynthesis.speak(utterance);
+        }
+        function volumeContextMenu(e) {
+            e.preventDefault(); // Prevent the default context menu
+            const contextMenu = document.getElementById('speechContextMenu');
+            const rect = e.target.getBoundingClientRect();
+
+            // Position and Show Context Menu
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = `${e.clientX - rect.left}px`;
+            contextMenu.style.top = `${e.clientY - rect.top}px`;
+        }
+        function volumeRangeInput(e) {
+            if (e.target.id == 'rateRange') {
+                speechRate = e.target.value;
+            } else if (e.target.id == 'pitchRange') {
+                speechPitch = e.target.value;
+            } else if (e.target.id == 'volumeRange') {
+                speechVolume = e.target.value;
+            }
+        }
+
+        function nextNumber() {
+            if (current !== null) {
+                const currentRange = ranges[activeRangeIndex];
+                if (current < currentRange.end) {
+                    current++;
+                    announceCurrentNumber();
+                } else if (activeRangeIndex < ranges.length - 1) {
+                    activeRangeIndex++;
+                    current = ranges[activeRangeIndex].start;
+                    announceCurrentNumber();
+                } else {
+                    showSweetAlert('All ranges are completed.', "", 3000);
+                }
+                updateDisplay();
+                updateAbsentButtonText();
+            }
+        }
+
+        function prevNumber() {
+            if (current !== null) {
+                const currentRange = ranges[activeRangeIndex];
+                if (current > currentRange.start) {
+                    current--;
+                    announceCurrentNumber();
+                } else if (activeRangeIndex > 0) {
+                    // Move to the previous range
+                    activeRangeIndex--;
+                    current = ranges[activeRangeIndex].end;
+                    announceCurrentNumber();
+                } else {
+                    showSweetAlert('All ranges are completed.', "", 3000);
+                }
+                updateDisplay();
+                updateAbsentButtonText();
+            }
+        }
+
+        function editBox() {
+            const absentNumbersDiv = document.getElementById('absentNumbers');
+            const editButton = document.querySelector('.box-header .action-btns button:last-child');
+            isEditMode = !isEditMode;
+            if (absentNumbersDiv.contentEditable === "true") {
+                absentNumbersDiv.contentEditable = "false";
+                editButton.innerHTML = '<i class="bi bi-pencil-square"></i>'; // Switch back to Edit mode
+                saveEditedNumbers(absentNumbersDiv.textContent);
+            } else {
+                absentNumbersDiv.contentEditable = "true";
+                editButton.innerHTML = '<i class="bi bi-floppy"></i>'; // Show Save icon
+                absentNumbersDiv.focus();
+            }
+        }
+
+        function saveEditedNumbers(content) {
+            const editedNumbers = content.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+
+            if (attendanceType === "present") {
+                absents = ranges.flatMap(r => Array.from({ length: r.end - r.start + 1 }, (_, i) => r.start + i).filter(num => !editedNumbers.includes(num)))
+                document.getElementById('absentCount').innerHTML = ranges.flatMap(r => Array.from({ length: r.end - r.start + 1 }, (_, i) => r.start + i)).length - absents.length;
+                // document.getElementById('absentNumbers').textContent = absents.length
+                //     ? absents.join(', ')
+                //     : 'No numbers marked as absent.';
+            } else {
+                absents = editedNumbers;
+                document.getElementById('absentCount').innerHTML = absents.length;
+                // document.getElementById('absentNumbers').textContent = absents.length
+                //     ? absents.join(', ')
+                //     : 'No numbers marked as absent.';
+            }
+            updateBoxContent()
+
+        }
+
+        function updateDisplay() {
+            document.getElementById('currentNumber').textContent = current;
+        }
+
+        function markAbsent() {
+            if (current !== null) {
+                if (absents.includes(current)) {
+                    absents = absents.filter(num => num !== current);
+                } else {
+                    absents.push(current);
+                }
+                updateBoxContent();
+                updateAbsentButtonText();
+            }
+        }
+
+        function updateBoxContent() {
+            const boxContent = attendanceType === 'absent'
+                ? absents
+                : ranges.flatMap(r => Array.from({ length: r.end - r.start + 1 }, (_, i) => r.start + i).filter(num => !absents.includes(num)))
+
+            document.getElementById('absentNumbers').textContent = boxContent.length
+                ? boxContent.join(', ')
+                : attendanceType === 'absent'
+                    ? 'No numbers marked as absent.'
+                    : 'No numbers marked as present.';
+            document.getElementById('absentCount').innerHTML = boxContent.length;
+            attendanceType === 'absent'
+                ? document.getElementById('attendance-text').innerHTML = "Absent"
+                : document.getElementById('attendance-text').innerHTML = "Present"
+        }
+
+        function updateAbsentButtonText() {
+            if (document.getElementById('absentButton').disabled) {
+                if (attendanceType === 'present')
+                    document.getElementById('absentButton').textContent = "Present"
+                else
+                    document.getElementById('absentButton').textContent = "Absent"
+            } else {
+                const absentButton = document.getElementById('absentButton');
+                const isMarked = attendanceType === 'absent' ? absents.includes(current) : !absents.includes(current);
+                absentButton.textContent = isMarked ? (attendanceType === 'absent' ? 'Present' : 'Absent') : (attendanceType === 'absent' ? 'Absent' : 'Present');
+            }
+        }
+
+        function onDropdownChange() {
+            const selectedKey = document.getElementById("rangeDropdown").value;
+            const renameButton = document.getElementById("renameButton");
+            const deleteButton = document.getElementById("deleteButton");
+            const saveChangesButton = document.getElementById("saveChangesButton");
+            if (selectedKey) {
+                renameButton.disabled = false;
+                deleteButton.disabled = false;
+                saveChangesButton.disabled = false;
+            } else {
+                renameButton.disabled = true;
+                deleteButton.disabled = true;
+                saveChangesButton.disabled = true;
+            }
+        }
+
+        function resetDropDown() {
+            updateDropdown();
+            onDropdownChange();
+            document.getElementById("saveChangesButton").disabled = true;
+        }
+
+        async function saveRanges() {
+            const startInputs = document.querySelectorAll(".startRangeInput");
+            const endInputs = document.querySelectorAll(".endRangeInput");
+
+            const ranges = [];
+            for (let i = 0; i < startInputs.length; i++) {
+                const start = parseInt(startInputs[i].value);
+                const end = parseInt(endInputs[i].value);
+
+                if (isNaN(start) || isNaN(end) || start > end) {
+                    showSweetAlert("Please enter valid ranges.", "danger", 3000);
+                    return;
+                }
+                ranges.push({ start, end });
+            }
+            const rangeName = await showCustomPopup("prompt", "Enter Name", "Enter a name for this range:");
+            setTimeout(() => {
+                if (!rangeName) {
+                    showSweetAlert("Range name is required.", "danger", 3000);
+                    return;
+                }
+                if (rangeDictionary[rangeName]) {
+                    showSweetAlert("A range with this name already exists.", "danger", 3000);
+                    return;
+                }
+
+                rangeDictionary[rangeName] = ranges;
+                localStorage.setItem("rangeDictionary", JSON.stringify(rangeDictionary));
+                updateDropdown();
+                document.getElementById("rangeDropdown").value = rangeName;
+                onDropdownChange();
+                showSweetAlert("Ranges saved successfully!", "success", 3000);
+            }, 100);
+        }
+
+        function saveChanges() {
+            const selectedKey = document.getElementById("rangeDropdown").value;
+            if (!selectedKey || !rangeDictionary[selectedKey]) return;
+
+            const startInputs = document.querySelectorAll(".startRangeInput");
+            const endInputs = document.querySelectorAll(".endRangeInput");
+
+            const updatedRanges = [];
+            for (let i = 0; i < startInputs.length; i++) {
+                const start = parseInt(startInputs[i].value);
+                const end = parseInt(endInputs[i].value);
+
+                if (isNaN(start) || isNaN(end) || start > end) {
+                    showSweetAlert("Please enter valid ranges.", "danger", 3000);
+                    return;
+                }
+                updatedRanges.push({ start, end });
+            }
+
+            rangeDictionary[selectedKey] = updatedRanges;
+            localStorage.setItem("rangeDictionary", JSON.stringify(rangeDictionary));
+            showSweetAlert("Changes saved successfully!", "success", 3000);
+        }
+
+        async function renameRange() {
+            const selectedKey = document.getElementById("rangeDropdown").value;
+            if (!selectedKey || !rangeDictionary[selectedKey]) return;
+
+            // const newName = prompt("Enter a new name for this range:", selectedKey);
+            const newName = await showCustomPopup("prompt", "Enter New Name", `Enter a new name for this range:`, selectedKey);
+            setTimeout(() => {
+                if (!newName) return;
+                if (!newName || newName === selectedKey) return;
+
+                if (rangeDictionary[newName]) {
+                    showSweetAlert("A range with this name already exists.", "danger", 3000);
+                    return;
+                }
+
+                rangeDictionary[newName] = rangeDictionary[selectedKey];
+                delete rangeDictionary[selectedKey];
+                localStorage.setItem("rangeDictionary", JSON.stringify(rangeDictionary));
+                updateDropdown();
+                document.getElementById("rangeDropdown").value = newName;
+                onDropdownChange();
+                showSweetAlert("Range renamed successfully!", "success", 3000);
+            }, 100)
+        }
+
+        async function deleteSavedRange() {
+            const selectedKey = document.getElementById("rangeDropdown").value;
+            if (!selectedKey || !rangeDictionary[selectedKey]) return;
+
+            // const confirmation = confirm(`Are you sure you want to delete '${selectedKey}' range`);
+            const confirmation = await showCustomPopup("confirmation", "Confirm Action", `Are you sure you want to delete '${selectedKey}' range?`);
+
+            if (!confirmation) return;
+
+            delete rangeDictionary[selectedKey];
+            localStorage.setItem("rangeDictionary", JSON.stringify(rangeDictionary));
+            resetDropDown();
+        }
+
+        function updateDropdown() {
+            const dropdown = document.getElementById("rangeDropdown");
+            dropdown.innerHTML = `<option value="" disabled selected>Select a range</option>`;
+            for (const key in rangeDictionary) {
+                const option = document.createElement("option");
+                option.value = key;
+                option.textContent = key;
+                dropdown.appendChild(option);
+            }
+        }
+
+        function setRangesFromDropdown() {
+            const selectedKey = document.getElementById("rangeDropdown").value;
+            if (!selectedKey || !rangeDictionary[selectedKey]) return;
+
+            const ranges = rangeDictionary[selectedKey];
+            const rangesContainer = document.getElementById("rangesContainer");
+            rangesContainer.innerHTML = "";
+
+            ranges.forEach(({ start, end }) => {
+                const rangeGroup = document.createElement("div");
+                rangeGroup.className = 'd-flex align-items-center mb-2 range-group';
+                rangeGroup.innerHTML = `
+                    <input type="number" class="form-control me-2 startRangeInput" value="${start}" placeholder="Start"">
+                    <input type="number" class="form-control me-1 endRangeInput" value="${end}" placeholder="End"">
+                    <button class="btn btn-danger ms-2 deleteRangebtn" onclick="deleteRange(this)">
+                        <i class="bi bi-x-circle"></i>
+                    </button>`;
+                rangesContainer.appendChild(rangeGroup);
+            });
+        }
+
+        function copyBox() {
+            const content = document.getElementById('absentNumbers').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                showSweetAlert('Copied to clipboard!', "success", 3000);
+            });
+        }
+
+        function clearBox() {
+            absents = [];
+
+            document.getElementById('absentNumbers').textContent = 'No numbers marked as absent.';
+            document.getElementById('absentCount').innerHTML = absents.length;
+
+        }
+
+        function enableControls() {
+            document.getElementById('prevButton').disabled = false;
+            document.getElementById('nextButton').disabled = false;
+            document.getElementById('absentButton').disabled = false;
+        }
+
+        function disableControls() {
+            document.getElementById('prevButton').disabled = true;
+            document.getElementById('nextButton').disabled = true;
+            document.getElementById('absentButton').disabled = true;
+        }
+
+        function showCustomPopup(type, title, message, value = "") {
+            return new Promise((resolve) => {
+                isEditMode = true;
+                // Get popup elements
+                const popup = document.getElementById("customPopup");
+                const popupTitle = document.getElementById("popupTitle");
+                const popupMessage = document.getElementById("popupMessage");
+                const popupInput = document.getElementById("popupInput");
+                const popupConfirmBtn = document.getElementById("popupConfirmBtn");
+                const popupCancelBtn = document.getElementById("popupCancelBtn");
+
+                // Set content
+                popupTitle.textContent = title || "Notification";
+                popupMessage.textContent = message || "";
+                popupInput.style.display = type === "prompt" ? "block" : "none";
+                popupInput.value = value; // Clear input for prompt type
+
+                // Show popup
+                popup.classList.add("visible");
+
+                // Handle confirm button click
+                popupConfirmBtn.onclick = () => {
+                    popup.classList.remove("visible");
+                    isEditMode = false;
+                    if (type === "prompt") {
+                        resolve(popupInput.value); // Return input value for prompt
+                    } else if (type === "confirmation") {
+                        resolve(true); // Return true for confirm
+                    }
+                };
+
+                // Handle cancel button click
+                popupCancelBtn.onclick = () => {
+                    popup.classList.remove("visible");
+                    isEditMode = false;
+                    if (type === "prompt") {
+                        resolve(null); // Return null for prompt cancellation
+                    } else if (type === "confirmation") {
+                        resolve(false); // Return false for confirm cancellation
+                    }
+                };
+            });
+        }
+        function closePopup() {
+            document.getElementById("customPopup").classList.remove("visible");
+            isEditMode = !isEditMode;
+        }
+        function showSweetAlert(message, bgColor, duration) {
+
+            const alertContainer = document.getElementById("customAlert");
+            const alertMessage = alertContainer.querySelector(".alert-message");
+            const progressBar = alertContainer.querySelector(".progress-bar");
+
+            alertContainer.className = `custom-alert ${bgColor === "success" ? "alert-success" : "alert-danger"}`;
+            alertMessage.textContent = message;
+            progressBar.style.animationDuration = `${duration / 1000}s`;
+            alertContainer.style.display = "block";
+
+            setTimeout(() => {
+                closeCustomAlert();
+            }, duration);
+        }
+
+        function closeCustomAlert() {
+            const alertContainer = document.getElementById("customAlert");
+            alertContainer.style.animation = "fadeOut 0.3s ease-in-out";
+            setTimeout(() => {
+                alertContainer.style.display = "none";
+                alertContainer.style.animation = ""; // Reset animation
+            }, 300); // Match fadeOut animation duration
+        }
+
+    </script>
+</body>
+
+</html>
